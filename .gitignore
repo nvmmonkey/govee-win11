@@ -1,0 +1,6 @@
+.superpowers/
+user_data/
+__pycache__/
+.pytest_cache/
+build/
+dist/

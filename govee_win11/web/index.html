@@ -1,0 +1,434 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title data-i18n="app.title">Govee 控制台</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<!-- Visible text: data-i18n / data-i18n-title / data-i18n-placeholder keys from
+     i18n.js (the Chinese written here is only the fallback before the script runs). -->
+<div class="app">
+
+  <!-- ============================== 侧栏 ============================== -->
+  <aside class="sidebar">
+    <div class="brand">
+      <svg class="brand-logo" viewBox="0 0 32 32" aria-hidden="true">
+        <defs>
+          <linearGradient id="lg-brand" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#ff5a6a"/><stop offset=".35" stop-color="#ffc23d"/>
+            <stop offset=".7" stop-color="#2fd3c4"/><stop offset="1" stop-color="#7a5cff"/>
+          </linearGradient>
+        </defs>
+        <rect x="2" y="2" width="28" height="28" rx="9" fill="url(#lg-brand)"/>
+        <rect x="7" y="13.5" width="18" height="5" rx="2.5" fill="#15171c" opacity=".85"/>
+      </svg>
+      <div class="brand-text">
+        <div class="brand-name" data-i18n="app.title">Govee 控制台</div>
+        <div class="brand-sub" data-i18n="brand.sub">H6125 RGBIC 灯带</div>
+      </div>
+    </div>
+
+    <nav class="nav" id="nav">
+      <button class="nav-item active" data-page="segments">
+        <svg viewBox="0 0 24 24"><rect x="3" y="9" width="4" height="6" rx="1.2"/><rect x="10" y="9" width="4" height="6" rx="1.2"/><rect x="17" y="9" width="4" height="6" rx="1.2"/></svg>
+        <span data-i18n="nav.segments">分段配色</span>
+      </button>
+      <button class="nav-item" data-page="diy">
+        <svg viewBox="0 0 24 24"><path d="M12 3l1.9 4.6L18.5 9l-4.6 1.9L12 15.5l-1.9-4.6L5.5 9l4.6-1.4z"/><path d="M18 15l.9 2.1L21 18l-2.1.9L18 21l-.9-2.1L15 18l2.1-.9z"/></svg>
+        <span data-i18n="nav.diy">DIY 效果</span>
+      </button>
+      <button class="nav-item" data-page="scenes">
+        <svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="14" rx="3"/><path d="M3.5 15l5-4.5 4 3.5 3-2.5 5 4"/><circle cx="16" cy="9" r="1.6"/></svg>
+        <span data-i18n="nav.scenes">情景</span>
+      </button>
+      <button class="nav-item" data-page="screen">
+        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M9 20h6M12 16v4"/></svg>
+        <span data-i18n="nav.screen">屏幕同步</span>
+      </button>
+      <button class="nav-item" data-page="music">
+        <svg viewBox="0 0 24 24"><path d="M9 18V6l11-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="17.5" cy="16" r="2.5"/></svg>
+        <span data-i18n="nav.music">音乐</span>
+      </button>
+      <button class="nav-item" data-page="settings">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2.8v2.4M12 18.8v2.4M2.8 12h2.4M18.8 12h2.4M5.5 5.5l1.7 1.7M16.8 16.8l1.7 1.7M5.5 18.5l1.7-1.7M16.8 7.2l1.7-1.7"/></svg>
+        <span data-i18n="nav.settings">设置</span>
+      </button>
+    </nav>
+
+    <div class="now" id="nowCard">
+      <div class="now-label" data-i18n="now.label">当前</div>
+      <div class="now-title" id="nowTitle">—</div>
+      <button class="btn btn-ghost btn-sm now-stop" id="nowStop" hidden data-i18n="common.stop">停止</button>
+    </div>
+  </aside>
+
+  <!-- ============================== 主区 ============================== -->
+  <main class="main">
+    <header class="topbar">
+      <div class="topbar-row">
+        <div class="conn" id="conn" data-status="disconnected">
+          <span class="dot"></span><span class="conn-text" id="connText" data-i18n="status.disconnected">空闲（未占用灯带）</span>
+        </div>
+        <div class="spacer"></div>
+        <label class="bright" title="亮度" data-i18n-title="top.brightness">
+          <svg viewBox="0 0 24 24" class="ico"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/></svg>
+          <input type="range" id="brightness" min="0" max="100" step="1" value="80" class="range">
+          <span class="bright-val" id="brightVal">80%</span>
+        </label>
+        <div class="power" id="power" data-power="unknown" title="电源" data-i18n-title="top.power">
+          <svg viewBox="0 0 24 24" class="ico"><path d="M12 3v9"/><path d="M6.3 7.2a8 8 0 1 0 11.4 0"/></svg>
+          <button class="power-btn" data-on="1" data-i18n="top.on">开</button>
+          <button class="power-btn" data-on="0" data-i18n="top.off">关</button>
+        </div>
+      </div>
+      <div class="busy-banner" id="busyBanner" hidden></div>
+      <div class="strip-wrap">
+        <div class="strip" id="topStrip"></div>
+        <div class="strip-cap" id="stripCap" data-i18n="strip.preview">灯带预览</div>
+      </div>
+    </header>
+
+    <div class="pages">
+
+      <!-- ---------------------------- 分段配色 ---------------------------- -->
+      <section class="page active" id="page-segments">
+        <div class="page-head">
+          <h1 data-i18n="seg.title">分段配色</h1>
+          <p class="sub" data-i18n="seg.sub">点选或拖选灯段，再点颜色即可上色。最左边是第 1 段（灯带起点）。</p>
+        </div>
+
+        <div class="card">
+          <div class="seg-big" id="segBig"></div>
+          <div class="seg-tools">
+            <span class="muted" id="segSelInfo" data-i18n="seg.none">未选择灯段</span>
+            <div class="spacer"></div>
+            <button class="btn btn-ghost btn-sm" id="segSelAll" data-i18n="seg.selectAll">全选</button>
+            <button class="btn btn-ghost btn-sm" id="segSelNone" data-i18n="seg.clearSel">清除选择</button>
+          </div>
+        </div>
+
+        <div class="seg-grid">
+          <div class="card">
+            <div class="card-title" data-i18n="common.colors">颜色</div>
+            <div id="segPicker"></div>
+            <div class="btn-row">
+              <button class="btn btn-primary" id="segApplySel" data-i18n="seg.applySel">应用到所选段</button>
+              <button class="btn" id="segFill" data-i18n="seg.fill">整条填充</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">
+              <span data-i18n="seg.palette">调色板</span>
+              <div class="spacer"></div>
+              <button class="btn btn-accent-soft btn-sm" id="segRecommend" data-i18n="common.recommend">配色推荐</button>
+            </div>
+            <div class="muted small" data-i18n="seg.palHint">点色块给所选段上色</div>
+            <div class="swatch-row" id="segPalSwatches"></div>
+            <div class="btn-row">
+              <button class="btn btn-sm" id="segPalTile" data-i18n="seg.palTile">用调色板铺满整条</button>
+            </div>
+            <div class="divider"></div>
+            <div class="pal-list" id="palList"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ---------------------------- DIY 效果 ---------------------------- -->
+      <section class="page" id="page-diy">
+        <div class="diy-layout">
+          <div class="card preset-col">
+            <div class="card-title">
+              <span data-i18n="diy.mine">我的 DIY</span>
+              <div class="spacer"></div>
+              <button class="btn btn-ghost btn-sm" id="diyNew" title="新建一个 DIY" data-i18n-title="diy.newTitle" data-i18n="diy.new">＋ 新建</button>
+            </div>
+            <ul class="preset-list" id="presetList"></ul>
+          </div>
+
+          <div class="card editor">
+            <div class="editor-hero">
+              <div class="diy-badge">
+                <svg viewBox="0 0 24 24"><path d="M12 3l1.9 4.6L18.5 9l-4.6 1.9L12 15.5l-1.9-4.6L5.5 9l4.6-1.4z"/></svg>
+                <span>DIY</span>
+              </div>
+              <input class="name-input" id="diyName" maxlength="32" placeholder="给效果起个名字" data-i18n-placeholder="diy.namePh" spellcheck="false">
+            </div>
+
+            <div class="tabs" id="diyTabs">
+              <button class="tab active" data-tab="simple" data-i18n="diy.simple">简单</button>
+              <button class="tab" data-tab="mix" data-i18n="diy.mix">混合</button>
+            </div>
+
+            <div class="editor-body">
+              <div class="sec" id="simpleSec">
+                <div class="sec-title" data-i18n="diy.effect">效果</div>
+                <button class="fx-row" id="fxRow" title="选择效果" data-i18n-title="diy.chooseEffect"></button>
+              </div>
+
+              <div class="sec" id="mixSec" hidden>
+                <div class="sec-title"><span data-i18n="diy.mixTitle">混合效果</span> <span class="muted small" data-i18n="diy.mixHint">按顺序轮流播放，每个约 8 秒</span></div>
+                <div class="mix-list" id="mixList"></div>
+                <button class="mix-add" id="mixAdd" title="添加效果" data-i18n-title="diy.addEffect">＋</button>
+              </div>
+
+              <div class="sec">
+                <div class="sec-title">
+                  <span data-i18n="diy.colorsTitle">添加颜色</span> <span class="muted small" id="diyColorCount"></span>
+                  <div class="spacer"></div>
+                  <button class="btn btn-accent-soft btn-sm" id="diyRecommend" data-i18n="common.recommend">配色推荐</button>
+                </div>
+                <div class="dots" id="diyColors"></div>
+              </div>
+
+              <div class="sec" id="widthSec" hidden>
+                <div class="sec-title"><span id="widthTitle"></span> <span class="muted small" id="widthHint"></span><div class="spacer"></div><span class="val" id="widthVal"></span></div>
+                <input type="range" class="range range-lg" id="diyWidth" min="2" max="8" step="1" value="4">
+              </div>
+
+              <div class="sec">
+                <div class="sec-title"><span data-i18n="diy.speed">速度</span><div class="spacer"></div><span class="val" id="speedVal">50</span></div>
+                <input type="range" class="range range-lg" id="diySpeed" min="0" max="100" step="1" value="50">
+              </div>
+            </div>
+
+            <div class="editor-note" id="diyRunNote"></div>
+            <div class="editor-actions">
+              <button class="btn btn-ghost" id="diyStop" data-i18n="common.stop">停止</button>
+              <div class="spacer"></div>
+              <button class="btn btn-primary btn-wide" id="diyApply" data-i18n="diy.apply">应用</button>
+              <button class="btn btn-success btn-wide" id="diySave" data-i18n="diy.save">保存</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ---------------------------- 情景 ---------------------------- -->
+      <section class="page" id="page-scenes">
+        <div class="page-head">
+          <h1 data-i18n="scenes.title">情景</h1>
+          <p class="sub" data-i18n="scenes.sub">官方情景不支持调速，想调速度请用 DIY 里的「极光」</p>
+        </div>
+        <div class="scene-bar">
+          <div class="tabs tabs-pill" id="sceneTabs"></div>
+          <input class="search" id="sceneSearch" placeholder="搜索情景" data-i18n-placeholder="scenes.search" spellcheck="false">
+        </div>
+        <div class="scene-grid" id="sceneGrid"></div>
+      </section>
+
+      <!-- ---------------------------- 屏幕同步 ---------------------------- -->
+      <section class="page" id="page-screen">
+        <div class="page-head">
+          <h1 data-i18n="screen.title">屏幕同步</h1>
+          <p class="sub" data-i18n="screen.sub">灯带跟随屏幕画面的颜色变化（Wallpaper Engine 动态壁纸也可以）。</p>
+        </div>
+
+        <div class="screen-grid">
+          <div class="card">
+            <div class="card-title" data-i18n="screen.displayMode">显示器与模式</div>
+            <label class="field">
+              <span class="field-label" data-i18n="screen.display">显示器</span>
+              <select class="select" id="scrMonitor"><option data-i18n="screen.loading">正在读取…</option></select>
+            </label>
+            <div class="field">
+              <span class="field-label" data-i18n="screen.mode">模式</span>
+              <div class="seg-ctl seg-ctl-many" id="scrMode">
+                <button data-mode="dominant" class="active" data-i18n="screen.mode.dominant">默认</button>
+                <button data-mode="fade" data-i18n="screen.mode.fade">淡入淡出</button>
+                <button data-mode="projection" data-i18n="screen.mode.projection">投影</button>
+                <button data-mode="region" data-i18n="screen.modeBtn.region">区域（6 竖条）</button>
+              </div>
+            </div>
+            <p class="muted small" id="scrModeHelp"></p>
+            <div class="slider-field" id="scrTempoField" hidden>
+              <div class="sf-head"><span><span data-i18n="screen.tempo">节奏</span> <span class="muted small" data-i18n="screen.tempoHint">越高换色越快</span></span><span class="val" id="scrTempoVal"></span></div>
+              <input type="range" class="range" id="scrTempo" min="0" max="100" step="5">
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title"><span data-i18n="screen.adjust">颜色调整</span><div class="spacer"></div><button class="btn btn-ghost btn-sm" id="scrReset" data-i18n="common.reset">恢复默认</button></div>
+            <div class="slider-field">
+              <div class="sf-head"><span data-i18n="screen.saturation">饱和度增强</span><span class="val" id="scrSatVal"></span></div>
+              <input type="range" class="range" id="scrSat" min="0" max="3" step="0.05">
+            </div>
+            <div class="slider-field">
+              <div class="sf-head"><span><span data-i18n="screen.transition">过渡时间</span> <span class="muted small" data-i18n="screen.transitionHint">越长变化越柔和，换画面时也更缓</span></span><span class="val" id="scrTransitionVal"></span></div>
+              <input type="range" class="range" id="scrTransition" min="0.3" max="5" step="0.1">
+            </div>
+            <div class="gain-grid">
+              <div class="slider-field">
+                <div class="sf-head"><span class="gain-r" data-i18n="screen.gainR">R 增益</span><span class="val" id="scrGainRVal"></span></div>
+                <input type="range" class="range range-r" id="scrGainR" min="0" max="2" step="0.05">
+              </div>
+              <div class="slider-field">
+                <div class="sf-head"><span class="gain-g" data-i18n="screen.gainG">G 增益</span><span class="val" id="scrGainGVal"></span></div>
+                <input type="range" class="range range-g" id="scrGainG" min="0" max="2" step="0.05">
+              </div>
+              <div class="slider-field">
+                <div class="sf-head"><span class="gain-b" data-i18n="screen.gainB">B 增益</span><span class="val" id="scrGainBVal"></span></div>
+                <input type="range" class="range range-b" id="scrGainB" min="0" max="2" step="0.05">
+              </div>
+            </div>
+            <p class="muted small" data-i18n="screen.gainHelp">灯光偏蓝就调低 B，偏绿就调低 G。同步运行时松开滑块即生效。</p>
+          </div>
+        </div>
+
+        <div class="run-bar">
+          <div class="run-state" id="scrState" data-i18n="common.notRunning">未运行</div>
+          <div class="spacer"></div>
+          <button class="btn btn-ghost" id="scrStop" data-i18n="common.stop">停止</button>
+          <button class="btn btn-primary btn-wide" id="scrStart" data-i18n="screen.start">开始同步</button>
+        </div>
+      </section>
+
+      <!-- ---------------------------- 音乐 ---------------------------- -->
+      <section class="page" id="page-music">
+        <div class="page-head">
+          <h1 data-i18n="music.title">音乐律动</h1>
+          <p class="sub" data-i18n="music.sub">读取电脑正在播放的声音，不用麦克风</p>
+        </div>
+        <div class="card">
+          <div class="card-title" data-i18n="common.colors">颜色</div>
+          <div class="color-sources" id="musicSources"></div>
+        </div>
+        <div class="card">
+          <div class="slider-field">
+            <div class="sf-head"><span><span data-i18n="music.sensitivity">灵敏度</span> <span class="muted small" data-i18n="music.sensitivityHint">声音小、灯不太动时调高</span></span><span class="val" id="musicSensVal"></span></div>
+            <input type="range" class="range range-lg" id="musicSens" min="0.1" max="5" step="0.1">
+          </div>
+        </div>
+        <div class="run-bar">
+          <div class="run-state" id="musicState" data-i18n="common.notRunning">未运行</div>
+          <div class="spacer"></div>
+          <button class="btn btn-ghost" id="musicStop" data-i18n="common.stop">停止</button>
+          <button class="btn btn-primary btn-wide" id="musicStart" data-i18n="music.start">开始</button>
+        </div>
+      </section>
+
+      <!-- ---------------------------- 设置 ---------------------------- -->
+      <section class="page" id="page-settings">
+        <div class="page-head"><h1 data-i18n="settings.title">设置</h1></div>
+        <div class="card setting-row">
+          <div>
+            <div class="setting-title" id="languageLabel" data-i18n="settings.language">语言 / Language</div>
+            <div class="muted small" data-i18n="settings.languageHint">自动：跟随 Windows 的显示语言</div>
+          </div>
+          <div class="spacer"></div>
+          <div class="seg-ctl" id="langCtl" role="group" aria-labelledby="languageLabel">
+            <button data-lang="auto" class="active" data-i18n="settings.langAuto">自动</button>
+            <button data-lang="zh" lang="zh-CN" data-i18n="settings.langZh">中文</button>
+            <button data-lang="en" lang="en" data-i18n="settings.langEn">English</button>
+          </div>
+        </div>
+        <div class="card" id="deviceCard">
+          <div class="card-title">
+            <span data-i18n="device.title">设备</span>
+            <div class="spacer"></div>
+            <button class="btn btn-ghost btn-sm" id="devForget" data-i18n="device.forget">忘记设备</button>
+            <button class="btn btn-sm" id="devScan" data-i18n="device.scan">搜索设备</button>
+          </div>
+          <div class="device-current" id="devCurrent"></div>
+          <p class="muted small" id="devOthers" hidden></p>
+          <div class="device-list" id="devList" hidden></div>
+          <p class="muted small" data-i18n="device.hint">只支持 H6125。搜索前请先断开手机 Govee App；电脑正连着的灯带不会出现在搜索结果里。</p>
+        </div>
+        <div class="card setting-row">
+          <div>
+            <div class="setting-title" id="autostartLabel" data-i18n="settings.autostart">开机自启</div>
+            <div class="muted small" data-i18n="settings.autostartHint">登录 Windows 后自动在托盘运行，并恢复上次的效果 / 同步模式</div>
+          </div>
+          <div class="spacer"></div>
+          <button class="switch" id="autostart" role="switch" aria-checked="false" aria-labelledby="autostartLabel"><span></span></button>
+        </div>
+        <div class="card setting-row">
+          <div>
+            <div class="setting-title" id="powerSyncLabel" data-i18n="settings.powerSync">开关机/睡眠时自动开关灯带</div>
+            <div class="muted small" data-i18n="settings.powerSyncHint">关机、重启、注销或睡眠时关闭灯带；开机自启或从睡眠唤醒后打开灯带，并恢复上次的模式</div>
+          </div>
+          <div class="spacer"></div>
+          <button class="switch" id="powerSync" role="switch" aria-checked="true" aria-labelledby="powerSyncLabel"><span></span></button>
+        </div>
+        <div class="card">
+          <div class="card-title" data-i18n="settings.transition">过渡方式（实验）</div>
+          <div class="field">
+            <span class="field-label wide" data-i18n="settings.rate">每段每秒刷新次数</span>
+            <div class="seg-ctl" id="trRate">
+              <button data-rate="3">3</button>
+              <button data-rate="5" class="active">5</button>
+              <button data-rate="8">8</button>
+              <button data-rate="10">10</button>
+            </div>
+          </div>
+          <p class="muted small" data-i18n="settings.rateHint">超过 5 次时灯带可能卡在过渡中</p>
+          <div class="field">
+            <span class="field-label wide" data-i18n="settings.mix">混合方式</span>
+            <div class="seg-ctl" id="trMix">
+              <button data-mix="linear" class="active" data-i18n="settings.mixLinear">光强</button>
+              <button data-mix="perceptual" data-i18n="settings.mixPerceptual">人眼</button>
+            </div>
+          </div>
+          <p class="muted small" data-i18n="settings.mixHint">光强：两种颜色按真实光线叠加；人眼：按屏幕颜色值直接混合。对动态效果、投影、屏幕同步、音乐律动立即生效，可边看边比较。</p>
+        </div>
+        <div class="card" id="colorCalCard">
+          <div class="card-title"><span data-i18n="settings.cal">颜色校准（白平衡）</span><div class="spacer"></div><button class="btn btn-ghost btn-sm" id="calReset" data-i18n="common.reset">恢复默认</button></div>
+          <p class="muted small" data-i18n="settings.calHint">先点「白」，调到灯带的白色和屏幕上的白色一致；一般只需要把偏多的颜色往下调。</p>
+          <div class="chips cal-tests" id="calTests">
+            <button class="chip" data-color="#FFFFFF"><i class="cal-dot" style="background:#FFFFFF"></i><span data-i18n="color.white">白</span></button>
+            <button class="chip" data-color="#FFD7A0"><i class="cal-dot" style="background:#FFD7A0"></i><span data-i18n="color.warmWhite">暖白</span></button>
+            <button class="chip" data-color="#808080"><i class="cal-dot" style="background:#808080"></i><span data-i18n="color.grey">灰</span></button>
+            <button class="chip" data-color="#E0AC8A"><i class="cal-dot" style="background:#E0AC8A"></i><span data-i18n="color.skin">肤色</span></button>
+            <button class="chip" data-color="#FF0000"><i class="cal-dot" style="background:#FF0000"></i><span data-i18n="color.red">红</span></button>
+            <button class="chip" data-color="#00FF00"><i class="cal-dot" style="background:#00FF00"></i><span data-i18n="color.green">绿</span></button>
+            <button class="chip" data-color="#0000FF"><i class="cal-dot" style="background:#0000FF"></i><span data-i18n="color.blue">蓝</span></button>
+          </div>
+          <div class="gain-grid">
+            <div class="slider-field">
+              <div class="sf-head"><span class="gain-r" data-i18n="color.red">红</span><span class="val" id="calRVal"></span></div>
+              <input type="range" class="range range-r" id="calR" min="0" max="100" step="1" value="100">
+            </div>
+            <div class="slider-field">
+              <div class="sf-head"><span class="gain-g" data-i18n="color.green">绿</span><span class="val" id="calGVal"></span></div>
+              <input type="range" class="range range-g" id="calG" min="0" max="100" step="1" value="100">
+            </div>
+            <div class="slider-field">
+              <div class="sf-head"><span class="gain-b" data-i18n="color.blue">蓝</span><span class="val" id="calBVal"></span></div>
+              <input type="range" class="range range-b" id="calB" min="0" max="100" step="1" value="100">
+            </div>
+          </div>
+          <div class="btn-row">
+            <span class="muted small" id="calState"></span>
+            <div class="spacer"></div>
+            <button class="btn btn-primary" id="calDone" disabled data-i18n="settings.calDone">完成</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title"><span data-i18n="settings.device">设备参数</span> <span class="muted small" data-i18n="settings.deviceHint">实测，只读</span></div>
+          <dl class="facts" id="facts"></dl>
+        </div>
+        <div class="card">
+          <div class="card-title" data-i18n="settings.about">关于</div>
+          <dl class="facts" id="about"></dl>
+          <p class="muted small" data-i18n="about.desc">非官方的 Govee H6125 Windows 控制台：通过蓝牙直连灯带，不需要云端或账号。与 Govee 公司无关联。</p>
+        </div>
+        <div class="card">
+          <div class="card-title" data-i18n="settings.window">窗口</div>
+          <p class="muted small" data-i18n="settings.windowHint1">最小化 = 隐藏到托盘，效果继续运行；关闭窗口 = 停止所有模式、断开蓝牙并退出。</p>
+          <p class="muted small" data-i18n="settings.windowHint2">只有动态效果、屏幕同步、音乐运行时才一直连着灯带；其他时候用完就断开，手机 App 可以随时连。</p>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<!-- ============================== 弹层 ============================== -->
+<div class="overlay" id="overlay" hidden>
+  <div class="modal" id="modal" role="dialog" aria-modal="true"></div>
+</div>
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<script src="i18n.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

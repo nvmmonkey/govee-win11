@@ -1,0 +1,7 @@
+bleak
+pywebview
+pystray
+Pillow
+mss>=10.2
+numpy
+PyAudioWPatch

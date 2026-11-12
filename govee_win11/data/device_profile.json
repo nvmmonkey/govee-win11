@@ -1,0 +1,7 @@
+{
+  "segment_count": 15,
+  "bit_order": "start_at_plug",
+  "brightness_max": 100,
+  "max_packets_per_s": 25,
+  "scene_cmd_version": 1
+}
